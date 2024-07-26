@@ -1,6 +1,8 @@
-'''
-Main function which acts as the interface for running the program
-'''
+"""
+The main entry point of the file integrity monitor application.
+
+This module sets up the file integrity monitor and starts the watchdog observer.
+"""
 
 from monitor import FileIntegrityMonitor
 
