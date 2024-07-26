@@ -7,6 +7,7 @@ Classes:
 import time
 import os
 from typing import Dict
+import watchdog
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from utils import calculate_hash, send_alert
@@ -65,13 +66,18 @@ class FileChangeHandler(FileSystemEventHandler):
         This function is called when a file is modified. 
         
         Args:
-            event (FileSystemEventHandler)
+            event (FileSystemEvent)
         """
-        file_path = event.src_path
-        new_hash = calculate_hash(file_path)
-        if new_hash != self.hashes.get(file_path):
-            self.hashes[file_path] = new_hash
-            send_alert(f"File {file_path} has been modified.")
+        if isinstance(event, watchdog.events.FileModifiedEvent):
+            file_path = event.src_path
+
+            new_hash = calculate_hash(file_path)
+            if new_hash != self.hashes.get(file_path):
+                self.hashes[file_path] = new_hash
+                print("File modification detected. Sending Alert")
+                send_alert(f"File {file_path} has been modified.")
+        else:
+            pass
 
     def on_created(self, event: FileSystemEvent) -> None:
         """
@@ -80,9 +86,15 @@ class FileChangeHandler(FileSystemEventHandler):
         Args:
             event (FileSystemEvent)
         """
-        file_path = event.src_path
-        self.hashes[file_path] = calculate_hash(file_path)
-        send_alert(f"File created: {file_path}")
+        if isinstance(event, watchdog.events.FileCreatedEvent):
+            file_path = event.src_path
+            self.hashes[file_path] = calculate_hash(file_path)
+            print("File Creation detected. Sending alert")
+            send_alert(f"File created: {file_path}")
+        elif isinstance(event, watchdog.events.DirCreatedEvent):
+            dir_path = event.src_path
+            print("Directory Creation detected. Sending alert")
+            send_alert(f"Directory created: {dir_path}")
 
     def on_deleted(self, event: FileSystemEvent) -> None:
         """
@@ -94,6 +106,7 @@ class FileChangeHandler(FileSystemEventHandler):
         file_path = event.src_path
         if file_path in self.hashes:
             del self.hashes[file_path]
+            print("File deletion detected. Sending alert")
             send_alert(f"File deleted: {file_path}")
 
     def __init__(self, hashes: Dict[str, str]):

@@ -24,9 +24,6 @@ def calculate_hash(file_path: str) -> Optional[str]:
     Returns:
         str: The hash of the file, or None if the file does not exist or cannot be read.
     """
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"File '{file_path}' not found")
-
     hash_sha256 = hashlib.sha256()
     try:
         with open(file_path, "rb") as f:
