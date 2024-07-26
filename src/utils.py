@@ -42,7 +42,7 @@ def send_alert(message: str) -> None:
         message(str): The email body to send
     """
     msg = MIMEText(message)
-    msg['Subject'] = "File Integrity Alert"
+    msg['Subject'] = "File Integrity Change Alert"
     msg['From'] = "sender_email@example.com"
     msg['To'] = "receiver_email@example.com"
 
