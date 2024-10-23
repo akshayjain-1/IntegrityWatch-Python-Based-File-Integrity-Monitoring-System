@@ -1,4 +1,4 @@
-# File Integrity Monitor
+# IntegrityWatch
 ------------------------
 
 ## Overview
